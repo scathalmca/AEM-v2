@@ -17,6 +17,8 @@ You can find more information about AEM in the following paper:
 
 doi.org/10.1007/s10909-024-03103-3
 
+It is also recommended that AEM run on a PC with 12 or more threads as CPUs below this have not been tested and may end up in a simulation loop due to slow simulation time.
+
 ### **MKIDs (Microwave Kinetic Inductance Detectors)** 
 MKIDs are thin-film superconducting LC resonators that detect photons with energies above hv > 2delta (delta is the superconducting band gap). The advantage of MKIDs over other superconducting detectors is the ease of multiplexing the pixels. In an array, each MKID has a unique resonant frequency that is controlled by the pixels geometrical design. In the most common case, the inductive portion of the MKID remains the same across pixels while the interdigitated capacitor is varied.
 
