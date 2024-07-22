@@ -44,8 +44,8 @@ elseif numel(S21(S21>1.000005))~=0
         S21(Remove_Index) = [];
         Frequency(Remove_Index) = [];
     else
-        upperbound = Resonance + 0.01;
-        lowerbound = Resonance - 0.01;
+        upperbound = mean([Resonance upperbound]);
+        lowerbound = mean([Resonance lowerbound]);
 
         [Resonance, Q_Factor] = Auto_Sim(Project, upperbound, lowerbound);
         return
@@ -54,6 +54,41 @@ elseif numel(S21(S21>1.000005))~=0
     
     
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Need to check that there is only one resonant frequency in the sweep to
+% avoid any harmonics appearing in the simulations for large frequency
+% sweeps.
+
+% To achieve this, we have to assume that the lowest resonance dip in the
+% sweep is what we are looking for
+% We also need to ignore any dips below |S21| > 0.9 and assume these are
+% not real resonant frequencies or harmonics.
+
+Minima_Index = find(islocalmin(S21));
+
+Minima_Below_Thres = Minima_Index(S21(Minima_Index)<0.9);
+
+if length(Minima_Below_Thres) > 1
+    % Find the lowest minimum
+
+    lowestMinIdx = Minima_Below_Thres(1);
+
+    % Assume the lowest minima is the correct resonant frequency 
+    Resonance = Frequency(lowestMinIdx);
+
+    upperbound = mean([Resonance upperbound]);
+    lowerbound = mean([Resonance lowerbound]);
+
+    [Resonance, Q_Factor] = Auto_Sim(Project, upperbound, lowerbound);
+    return
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% If the data has passed all of the checks, can perform Q_Factor
+% calculation.
+
 index = find(S21==min(S21));
 Resonance=round(Frequency(index),4);
 % Resonance found and data is physical
