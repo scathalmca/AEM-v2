@@ -1,5 +1,7 @@
 function [Project, Sweep_Matrix, All_MKID_Coords, CBar_Fail] = Param_CBar(Project, Sweep_Matrix, Q_Range, All_GND_Coords, All_MKID_Coords)
 
+global G_Variation
+
 Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
 Q_Factor = Sweep_Matrix{1, 6}(2,1);
 
@@ -137,7 +139,7 @@ while true
         % parameterised
         [Project, All_MKID_Coords, CBar_Fail] = CBar_Thickness(Project, All_MKID_Coords, All_GND_Coords, i*2);
 
-        if (CBar_Fail == 1) && (Thickness_Variation == 1)
+        if (CBar_Fail == 1) && (Thickness_Variation == 1) && G_Variation == 1
             % If both conditions are satisfied, this means that the
             % coupling bar has reached it's maximum length and maximum
             % thickness before reaching the surrounding GND plane.
@@ -148,6 +150,11 @@ while true
 
             return
 
+        elseif G_Variation ~= 1
+            msg = "This Geometry can not reach the required Qc values! Please adjust the geometry and retry the automation with AEM!";
+            f = msgbox(msg);
+            error(msg)
+            
         else
             % Need to reinitialise between thickness variations
 
