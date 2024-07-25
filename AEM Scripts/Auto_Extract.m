@@ -6,13 +6,13 @@ csvname = erase(Project.Filename, ".son") + ".csv" ;
 T=readmatrix(csvname);
 Frequency = T(1:end,1);
 S21= T(1:end, 6);
-TF_min = islocalmin(S21);
+TF_min = islocalmin(S21(S21<0.9));
 local_minima=S21(TF_min);
 upperbound = Frequency(end);
 lowerbound = Frequency(1);
 if (upperbound<=1) || (lowerbound<=1)
     upperbound = round(Frequency(end),4)+1;
-    lowerbound = round(Frequency(1), 4);
+    lowerbound = 1.001;
 end
 index = find(S21==min(S21));
 Resonance=Frequency(index);
@@ -112,7 +112,6 @@ try
     Q_Factor=Frequency(index)/x;
 
 catch ME
-    [Resonance, Q_Factor] = Auto_Sim(Project, upperbound+0.5, lowerbound-0.5);
-
+    [Resonance, Q_Factor] = Auto_Sim(Project, upperbound-0.5, lowerbound+0.5);
 end
 end

@@ -160,7 +160,7 @@ while true
         [Resonance, Q_Factor] = Auto_Sim(Project, upperbound, lowerbound);
         return
     end
-    if check_time > round(Time_Limit/4) || (Excel_Check/60) >= 2
+    if check_time > round(Time_Limit) || (Excel_Check/60) >= 2
         % If the last time the Simulation logfile has been accessed is over
         % 25% of the maximum time limit, then test to see if the .csv Excel
         % file produced has enough data points to perform meaningful data

@@ -1,11 +1,10 @@
-function [] = AEM(Project, StartingVariables)
+function [] = AEM(Project, StartingVariables, GND_Input)
 %  NEWAEM l function for running the automation software AEM.
-
 % Clear all existing global variables
 clear global
 
 % Make global variables
-global FirstLogProject f Time_Limit Int_Cap_Coords F_Spacing Bar_Thickness
+global FirstLogProject f Time_Limit Int_Cap_Coords F_Spacing Bar_Thickness G_Variation
 %                   FirstLogProject
 % The first project in the Sonnet Simulation Queue.
 % This file needs to be monitored as the simulation status of all
@@ -17,6 +16,12 @@ global FirstLogProject f Time_Limit Int_Cap_Coords F_Spacing Bar_Thickness
 % The maximum amount of time allowed per simulation. Please check
 % min_Structure.m for details on why this is needed.
 % Assume the Time_Limit for the first simulation doesn't exist...
+%                     G_Variation
+% The user chooses whether AEM is allowed to perform any parameterisation
+% on the surrounding GND polygons surrounding the MKID.
+% This is usually required for specific geometries or for large array
+% designs where it is not possible to vary the GND plane.
+G_Variation = GND_Input;
 Time_Limit = 1e5;
 FirstLogProject = 'Empty';
 warning off
@@ -105,7 +110,12 @@ if min(User_Frequencies) < min_Resonance || max(User_Frequencies) > max_Resonanc
         return
     end
 end
+
+
+% Initialize the maximum resonant structure
+
 Project = SonnetProject(num2str(max_Resonance*1000)+"MHz.son");
+
 
 [TopX, TopY, BotX, BotY] = VerticalMKID_Coords(Project, All_GND_Coords);
 All_MKID_Coords = {TopY, LeftX, RightX, RightY, BotX, BotY};
@@ -268,4 +278,5 @@ movefile *MHz.csv ExcessGeometries\
 waitbar(1, f, "All Resonators Successfully Automated by AEM!");
 % Display the automation software has finished successfully.
 disp("Resonators Successfully Simulated!");
+
 end
