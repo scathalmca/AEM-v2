@@ -4,7 +4,7 @@ function [] = AEM(Project, StartingVariables, GND_Input)
 clear global
 
 % Make global variables
-global FirstLogProject f Time_Limit Int_Cap_Coords F_Spacing Bar_Thickness G_Variation
+global FirstLogProject f Time_Limit Int_Cap_Coords F_Spacing Bar_Thickness G_Variation Mesh_Level
 %                   FirstLogProject
 % The first project in the Sonnet Simulation Queue.
 % This file needs to be monitored as the simulation status of all

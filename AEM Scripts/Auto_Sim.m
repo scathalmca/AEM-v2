@@ -2,7 +2,7 @@ function [Resonance, Q_Factor] = Auto_Sim(Project, upperbound, lowerbound)
 %  AUTO_SIM2 Brief summary of this function.
 % 
 % Detailed explanation of this function.
-global Time_Limit FirstLogProject
+global Time_Limit FirstLogProject Mesh_Level
 % Add to the simulation counter
 SimCounter("sim");
 % Check is a .csv file already exists with the same project filename and
@@ -160,7 +160,7 @@ while true
         [Resonance, Q_Factor] = Auto_Sim(Project, upperbound, lowerbound);
         return
     end
-    if check_time > round(Time_Limit) || (Excel_Check/60) >= 2
+    if check_time > round(Time_Limit) || (Excel_Check/60) >= abs(Mesh_Level-3)
         % If the last time the Simulation logfile has been accessed is over
         % 25% of the maximum time limit, then test to see if the .csv Excel
         % file produced has enough data points to perform meaningful data
