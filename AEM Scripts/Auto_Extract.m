@@ -18,7 +18,7 @@ index = find(S21==min(S21));
 Resonance=Frequency(index);
 % Check if any resonant frequencies exist in the frequency range or if S21
 % suddenly drops anywhere away from resonance.
-if isempty(local_minima)==1 && S21(end) == min(S21)
+if (isempty(local_minima)==1 && S21(end) == min(S21)) 
     % No resonance detected
     disp("No resonance detected...")
     upperbound = upperbound+1;
@@ -114,4 +114,6 @@ try
 catch ME
     [Resonance, Q_Factor] = Auto_Sim(Project, upperbound-0.5, lowerbound+0.5);
 end
+
+clear Frequency S21 T
 end

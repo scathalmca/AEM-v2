@@ -12,9 +12,9 @@ prev_X1 = Sweep_Matrix{1, 1}(1,1);
 prev_X2 = Sweep_Matrix{1, 2}(1,1);
 while true
     Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
-    X1_Co = Sweep_Matrix{1, 1}(1,1)
-    X2_Co = Sweep_Matrix{1, 2}(1,1)
-    X3_Co = Sweep_Matrix{1, 3}(1,1)
+    X1_Co = Sweep_Matrix{1, 1}(1,1);
+    X2_Co = Sweep_Matrix{1, 2}(1,1);
+    X3_Co = Sweep_Matrix{1, 3}(1,1);
     % If the user's resonant frequency lies within 3 blocks, perform a
     % 1 block iteration instrad of a binary sweep
     if abs(X3_Co - X2_Co) <= 3 || abs(X1_Co - X3_Co) <= 3 || ((Resonance <= User_Frequency+Accuracy) && (Resonance >= User_Frequency-Accuracy))  

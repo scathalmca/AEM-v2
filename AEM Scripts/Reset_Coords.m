@@ -33,38 +33,25 @@ Poly_XCoords =[min(Poly_XCoords)  max(Poly_XCoords)  max(Poly_XCoords)  min(Poly
 Poly_YCoords = [Poly_YCoords{2}  Poly_YCoords{3}  Poly_YCoords{4}  Poly_YCoords{5}];
 Poly_YCoords =[min(Poly_YCoords)  min(Poly_YCoords)  max(Poly_YCoords)  max(Poly_YCoords)];
 % Append New Coordinates
-X1_Co = Poly_XCoords(1)
-X2_Co = Poly_XCoords(2)
-Y1_Co = Poly_YCoords(1)
-Y2_Co = Poly_YCoords(3)
+X1_Co = Poly_XCoords(1);
+X2_Co = Poly_XCoords(2);
+Y1_Co = Poly_YCoords(1);
+Y2_Co = Poly_YCoords(3);
 F_Thickness = Y2_Co - Y1_Co;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calculate how many fingers have been constructed so far
-Y_total=(Int_Cap_Coords(4)-(Bar_Thickness+F_Spacing)-Y2_Co)
+Y_total=(Int_Cap_Coords(4)-(Bar_Thickness+F_Spacing)-Y2_Co);
 % Starting finger
 Start = floor(Y_total/(F_Spacing+F_Thickness))+1;
-Cap = Int_Cap_Coords(4)
-Bar_Thickness
-F_Spacing
-F_Thickness
+Cap = Int_Cap_Coords(4);
+
 % Length of a single IDC finger.
 Length = round(Int_Cap_Coords(3)-(Int_Cap_Coords(1)+F_Spacing));
 % Calculate the maximum number of possible interdigitated fingers given the
 % capacitor area, spacing between fingers & F_Thickness of fingers.
 Y_total=(Int_Cap_Coords(4)-(Int_Cap_Coords(5)+F_Spacing)-Int_Cap_Coords(2));
 max_NumFingers=floor(Y_total/(F_Spacing+F_Thickness))-1;
-Project.Filename
-y1_co = Sweep_Matrix{1, 1}(1,2)
-y2_co = Sweep_Matrix{1, 1}(2,2)
-x1_co=Sweep_Matrix{1, 1}(1,1)
-x2_co = Sweep_Matrix{1, 2}(1,1)
-x3_co = Sweep_Matrix{1, 3}(1,1)
-f1 = Sweep_Matrix{1, 4}(1,1)
-f1_name = Sweep_Matrix{1, 4}(2,1)
-f2 = Sweep_Matrix{1, 5}(1,1)
-f2_name = Sweep_Matrix{1, 5}(2,1)
-user_frequency = Sweep_Matrix{1, 6}(1,1)
-Qfactor = Sweep_Matrix{1, 6}(2,1)
+
 % Remove capacitance
 if Resonance < User_Frequency 
     % Starting Y2_Co for the for loop

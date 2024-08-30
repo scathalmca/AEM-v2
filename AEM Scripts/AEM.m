@@ -4,26 +4,16 @@ function [] = AEM(Project, StartingVariables, GND_Input)
 clear global
 
 % Make global variables
-global FirstLogProject f Time_Limit Int_Cap_Coords F_Spacing Bar_Thickness G_Variation Mesh_Level
-%                   FirstLogProject
-% The first project in the Sonnet Simulation Queue.
-% This file needs to be monitored as the simulation status of all
-% geometries after it are recorded in this log file
+global f Int_Cap_Coords F_Spacing Bar_Thickness G_Variation Mesh_Level
 %                         f
 % Stored window prompt to let the user know what stage AEM is currently on
 % and how far it has progressed.
-%                     Time_Limit
-% The maximum amount of time allowed per simulation. Please check
-% min_Structure.m for details on why this is needed.
-% Assume the Time_Limit for the first simulation doesn't exist...
 %                     G_Variation
 % The user chooses whether AEM is allowed to perform any parameterisation
 % on the surrounding GND polygons surrounding the MKID.
 % This is usually required for specific geometries or for large array
 % designs where it is not possible to vary the GND plane.
 G_Variation = GND_Input;
-Time_Limit = 1e5;
-FirstLogProject = 'Empty';
 warning off
 [~,check] = system('tasklist');
 if contains(check, 'sonnet.exe')
@@ -89,38 +79,12 @@ waitbar(0,f,"Checking Minimum & Maximum Resonant Frequencies...")
 % Call function to perform large binary search construction to
 % determine the possible resonant frequencies as well as the
 % structure that matches the user's largest frequency.
-[max_Resonance,min_Resonance, FirstLogProject, Time_Limit] = min_Structure(Project, F_Spacing, F_Thickness, Bar_Thickness, Mesh_Level);
-% Perform check to see if the structure allows for the frequencies given by
-% the user in the GUI
-if min(User_Frequencies) < min_Resonance || max(User_Frequencies) > max_Resonance
-    answer = questdlg("The user defined resonances do not lie within the maximum and minimum frequency for this particular geometry. Would you like to continue?") ;
-    if answer == "Yes"
-        %If user continues the automation after failing the check, reset
-        %the list of user frequencies to possible resonances for the given 
-        %geometry and begin automation.
-        User_Frequencies = User_Frequencies(User_Frequencies>min_Resonance);
-        User_Frequencies = User_Frequencies(User_Frequencies<max_Resonance);
-        if numel(User_Frequencies)==0
-            %If no MKIDs lie within the user's given range, cancel
-            %automation
-            warning("No Resonances Found! Change the Maximum and Minimum Frequencies!");
-            return
-        end
-    else
-        return
-    end
-end
-
-
-% Initialize the maximum resonant structure
-
-Project = SonnetProject(num2str(max_Resonance*1000)+"MHz.son");
-
+[Project, User_Frequencies, Starting_Point] = InterpStart(Project, User_Frequencies, F_Thickness);
 
 [TopX, TopY, BotX, BotY] = VerticalMKID_Coords(Project, All_GND_Coords);
 All_MKID_Coords = {TopY, LeftX, RightX, RightY, BotX, BotY};
 
-[Sweep_Matrix] = Asym_BinarySearch(Project, User_Frequencies, F_Spacing, F_Thickness, Bar_Thickness);
+[Sweep_Matrix] = Asym_BinarySearch(Project, User_Frequencies, Starting_Point, F_Spacing, F_Thickness, Bar_Thickness);
 Filename = Sweep_Matrix{1, 4}(2,1);
 Project = SonnetProject(Filename);
 % After finding two geometries that have the User_Frequency between them,
@@ -187,13 +151,6 @@ for b = 1: numel(User_Frequencies)
         end
         % If failed checks, repeat loop until a correct geometry is found
     end
-    % Close Sonnet.exe after each resonator is found.
-    % This removes previous simulation data stored in Sonnet to avoid
-    % crashes and speed up Sonnet's performance (slightly).
-    % Improves speed
-    [~,~]=system("taskkill /F /IM sonnet.exe");
-    % Reinitilize FirstLogProject for next MKID
-    FirstLogProject = 'Empty';
     % Filename of correct MKID to append to EndResonators
     Filename = convertCharsToStrings(Sweep_Matrix{1, 4}(2,1));
     % Count number of resonators successfully automated so far
@@ -278,5 +235,6 @@ movefile *MHz.csv ExcessGeometries\
 waitbar(1, f, "All Resonators Successfully Automated by AEM!");
 % Display the automation software has finished successfully.
 disp("Resonators Successfully Simulated!");
+%}
 
 end

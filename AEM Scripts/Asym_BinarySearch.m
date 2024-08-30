@@ -1,4 +1,4 @@
-function [Sweep_Matrix] = Asym_BinarySearch(Project, User_Frequencies, F_Spacing, F_Thickness, Bar_Thickness)
+function [Sweep_Matrix] = Asym_BinarySearch(Project, User_Frequencies, Starting_Point, F_Spacing, F_Thickness, Bar_Thickness)
 %  ASYM_BINARYSEARCH Function to place "half-interval" sections of interdigitated capacitor fingers
 % within the MKID IDC.
 %
@@ -10,7 +10,7 @@ function [Sweep_Matrix] = Asym_BinarySearch(Project, User_Frequencies, F_Spacing
 % The coordinates of the finger polygons, resonant frequencies, Q factor & filenames
 % are then appended to the Sweep_Matrix and returned.
 
-global FirstLogProject Int_Cap_Coords
+global Int_Cap_Coords
 
 Cap_x1 = Int_Cap_Coords(1);
 Cap_y1 = Int_Cap_Coords(2);
@@ -48,8 +48,9 @@ prev_filename = convertCharsToStrings(Project.Filename);
 
 Sweep_Matrix = [];
 
+
 % Begin iteration through all capacitor fingers
-for i=2:1:max_NumFingers
+for i=Starting_Point+1:1:max_NumFingers
 
     s=(-1)^i; % Clock to go from left side to right side of capacitor
     % Reset y1 and y2 coordinates every iteration
@@ -141,7 +142,7 @@ for i=2:1:max_NumFingers
                     % X coordinates to be of length 2 instead of the
                     % coordinates of the previous finger
                     prev_X_Array = [Cap_x1  (Cap_x1+2)  (Cap_x1+2)  Cap_x1];
-                    
+
                     Project = SonnetProject(prev_filename);
 
                     % Place length = 2 polygon.
@@ -281,4 +282,7 @@ for i=2:1:max_NumFingers
 
     end
 end
+
+
+
 end

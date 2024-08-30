@@ -13,18 +13,7 @@ end
 % Initialise project
 Filename = Sweep_Matrix{1, 4}(2,1);
 Project = SonnetProject(Filename);
-Project.Filename
-y1_co = Sweep_Matrix{1, 1}(1,2)
-y2_co = Sweep_Matrix{1, 1}(2,2)
-x1_co=Sweep_Matrix{1, 1}(1,1)
-x2_co = Sweep_Matrix{1, 2}(1,1)
-x3_co = Sweep_Matrix{1, 3}(1,1)
-f1 = Sweep_Matrix{1, 4}(1,1)
-f1_name = Sweep_Matrix{1, 4}(2,1)
-f2 = Sweep_Matrix{1, 5}(1,1)
-f2_name = Sweep_Matrix{1, 5}(2,1)
-user_frequency = Sweep_Matrix{1, 6}(1,1)
-Qfactor = Sweep_Matrix{1, 6}(2,1)
+
 % Perform Binary Sweep iterations of halfing capacitor finger length until
 % the closest possible resonant frequency is achieved.
 [Sweep_Matrix] = Binary_Block(Project, Sweep_Matrix);

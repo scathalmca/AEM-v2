@@ -10,11 +10,11 @@ global Int_Cap_Coords
 % For further description, please see the GitHub repository for AEM.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initializing IDC finger coordinates & values from Sweep_Matrix
-X1_Co = Sweep_Matrix{1, 1}(1,1)
-X2_Co = Sweep_Matrix{1, 2}(1,1)
-X3_Co = Sweep_Matrix{1, 3}(1,1)
-Y1_Co = Sweep_Matrix{1, 1}(1,2)
-Y2_Co = Sweep_Matrix{1, 1}(2,2)
+X1_Co = Sweep_Matrix{1, 1}(1,1);
+X2_Co = Sweep_Matrix{1, 2}(1,1);
+X3_Co = Sweep_Matrix{1, 3}(1,1);
+Y1_Co = Sweep_Matrix{1, 1}(1,2);
+Y2_Co = Sweep_Matrix{1, 1}(2,2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%                    Building Capacitor              %%%%%%%%
