@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="106450485" file="C:\Users\scath\Desktop\AEM\AEM v2\AEM.prj" location="C:\Users\scath\Desktop\AEM\AEM v2" name="AEM" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1726352628" file="C:\Users\scath\Desktop\AEM\AEM v2\AEM.prj" location="C:\Users\scath\Desktop\AEM\AEM v2" name="AEM" target="target.mlapps" target-name="Package App">
     <param.appname>AEM</param.appname>
     <param.authnamewatermark>Cáthal McAleer</param.authnamewatermark>
     <param.email>cmcaleer@cp.dias.ie</param.email>
@@ -11,17 +11,16 @@
       <file>${PROJECT_ROOT}\AEM_resources\icon_16.png</file>
     </param.icons>
     <param.summary>AEM - Automated Electromagnetic MKID Simulations</param.summary>
-    <param.description>AEM (Automated Electromagnetic MKID Simulations)</param.description>
-    <param.screenshot />
+    <param.description>AEM - Automated Electromagnetic MKID Simulations</param.description>
+    <param.screenshot>${PROJECT_ROOT}\AEM Logos\AEM Logo.png</param.screenshot>
     <param.version>2.2</param.version>
     <param.products.name />
     <param.products.id />
     <param.products.version />
     <param.platforms />
     <param.output>${PROJECT_ROOT}</param.output>
-    <param.guid>4cb0a6dd-28bf-468e-ab45-3a0d5ab02df0</param.guid>
+    <param.guid>5bd37f75-52bd-498d-91b9-bd16f8d9a936</param.guid>
     <unset>
-      <param.screenshot />
       <param.products.name />
       <param.products.id />
       <param.products.version />
