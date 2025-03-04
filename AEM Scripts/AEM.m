@@ -209,6 +209,7 @@ fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"FileName", repmat('_', 1, 6));
 fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"User Resonances(MHz)", repmat('_', 1, 6));
 fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"Resonances(MHz)", repmat('_', 1, 6));
 fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"Q-Factor", repmat('_', 1, 6), "|");
+fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"# of Sims", repmat('_', 1, 6), "|");
 for i=1:numel(all_Resonances)
     %%%%%%%%%%%%%%%%%%%%
     % Printing data to .txt
@@ -221,7 +222,7 @@ for i=1:numel(all_Resonances)
     % Round Qc Factors.
     all_QFactors(i)=round(all_QFactors(i));
     % Print values to .txtfile line by line.
-    fprintf(txtfile, "%s%23s%33s%26s", all_Filenames(i), num2str(User_Frequencies(i)*1000), num2str(all_Resonances(i)), num2str(all_QFactors(i)));
+    fprintf(txtfile, "%s%23s%33s%26s%26s", all_Filenames(i), num2str(User_Frequencies(i)*1000), num2str(all_Resonances(i)), num2str(all_QFactors(i)), num2str(simCounts(i)));
     %%%%%%%%%%%%%%%%%%%%
     % Storing .son and .csv files
     %%%%%%%%%%%%%%%%%%%%
