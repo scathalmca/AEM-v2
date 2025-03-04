@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="150444950" file="C:\Users\scath\Desktop\AEM v2\AEM.prj" location="C:\Users\scath\Desktop\AEM v2" name="AEM" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="106450485" file="C:\Users\scath\Desktop\AEM\AEM v2\AEM.prj" location="C:\Users\scath\Desktop\AEM\AEM v2" name="AEM" target="target.mlapps" target-name="Package App">
     <param.appname>AEM</param.appname>
     <param.authnamewatermark>Cáthal McAleer</param.authnamewatermark>
     <param.email>cmcaleer@cp.dias.ie</param.email>
@@ -11,16 +11,17 @@
       <file>${PROJECT_ROOT}\AEM_resources\icon_16.png</file>
     </param.icons>
     <param.summary>AEM - Automated Electromagnetic MKID Simulations</param.summary>
-    <param.description>AEM - Automated Electromagnetic MKID Simulations. This app automates the construction and design of Microwave Kinetic Inductance Detectors using Sonnet &amp; the SonnetLab Toolbox. For more information on the scripts, please see the GitHub: https://github.com/scathalmca/AEM-v2</param.description>
-    <param.screenshot>${PROJECT_ROOT}\AEM Logos\AEM Logo.png</param.screenshot>
-    <param.version>2.0</param.version>
+    <param.description>AEM (Automated Electromagnetic MKID Simulations)</param.description>
+    <param.screenshot />
+    <param.version>2.2</param.version>
     <param.products.name />
     <param.products.id />
     <param.products.version />
     <param.platforms />
     <param.output>${PROJECT_ROOT}</param.output>
-    <param.guid>c7c40b2e-1eae-43bd-97a3-4af87a2f12e7</param.guid>
+    <param.guid>4cb0a6dd-28bf-468e-ab45-3a0d5ab02df0</param.guid>
     <unset>
+      <param.screenshot />
       <param.products.name />
       <param.products.id />
       <param.products.version />
@@ -45,15 +46,14 @@
       <file>${PROJECT_ROOT}\AEM Scripts\EndResonators.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Frequency_Block.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\GNDPoly_Coords.m</file>
+      <file>${PROJECT_ROOT}\AEM Scripts\InterpStart.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\intersections.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Matrix_Maker.m</file>
-      <file>${PROJECT_ROOT}\AEM Scripts\min_Structure.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Param_CBar.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Param_GND.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Param_GNDPoly.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Q_Block.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Reset_Coords.m</file>
-      <file>${PROJECT_ROOT}\AEM Scripts\Resonator Data File.txt</file>
       <file>${PROJECT_ROOT}\AEM Scripts\Sense_Sweep.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\SideMKID_Coords.m</file>
       <file>${PROJECT_ROOT}\AEM Scripts\SimCounter.m</file>
@@ -164,7 +164,7 @@
     <fileset.resources />
     <fileset.package />
     <build-deliverables>
-      <file location="C:\Users\scath\Desktop" name="AEM v2" optional="false">C:\Users\scath\Desktop\AEM v2</file>
+      <file location="C:\Users\scath\Desktop\AEM" name="AEM v2" optional="false">C:\Users\scath\Desktop\AEM\AEM v2</file>
     </build-deliverables>
     <workflow />
     <matlab>
