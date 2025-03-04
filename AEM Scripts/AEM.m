@@ -66,6 +66,8 @@ Int_Cap_Coords = [Cap_x1 Cap_y1 Cap_x2 Cap_y2 Bar_Thickness];
 Accuracy_Perc=[]; 
 % Accuracy (abs(Chosen - Actual)) MHz
 Accuracy_Freq=[];
+% Counting number of simulations per resonator
+simCounts =[];
 % Initialize the number of correct resonator geometries found
 Res_Num = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,6 +162,16 @@ for b = 1: numel(User_Frequencies)
     % Calculate accuracy values of Resonant Frequency and append to list.
     Accuracy_Perc = [Accuracy_Perc  (100 - (abs((Resonance - User_Frequency)/User_Frequency)*100))];
     Accuracy_Freq = [Accuracy_Freq  (abs(User_Frequencies(b) - Resonance)*1000)];
+
+    % Return the total number of Sonnet simulations performed for the
+    % current resonator
+    [Counter] = SimCounter("get"); 
+
+    % Add number of simulations to an array to plot later
+    simCounts = [simCounts  Counter];
+
+    % Reset the number of simulations performed.
+    SimCounter('new'); 
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -171,8 +183,7 @@ end
 % Return all resonant frequencies, Q Factor and Filenames belonging to the
 % finished MKIDs.
 [all_Resonances, all_QFactors, all_Filenames] = EndResonators(0, 0, 0, "get");
-% Return the total number of Sonnet simulations performed
-[Counter] = SimCounter("get"); 
+
 % Create .txt file.
 txtfile=fopen("Resonator Data File.txt", "w+");
 % Stop timer and calculate elapsed time
@@ -185,7 +196,9 @@ seconds = num2str(mod(elapsedTime, 60));
 % Display runtime in format hours/minutes/seconds
 fprintf(txtfile,'%s%s%s%s%s%s%s',"Runtime| ","Hours: ", hours,"  Minutes: ", minutes, "  Seconds: ",seconds);
 fprintf(txtfile, "\n");
-fprintf(txtfile,"%s%s", "Number of Simulations Performed: ", num2str(Counter));
+fprintf(txtfile,"%s%s", "Total Simulations Performed: ", num2str(sum(simCounts)));
+fprintf(txtfile, "\n");
+fprintf(txtfile,"%s%s", "Average Simulations Performed Per MKID: ", num2str(mean(simCounts)));
 fprintf(txtfile, "\n");
 fprintf(txtfile,"%s%s", "Mean Accuracy(%) ", num2str(mean(Accuracy_Perc)));
 fprintf(txtfile, "\n");
@@ -235,6 +248,25 @@ movefile *MHz.csv ExcessGeometries\
 waitbar(1, f, "All Resonators Successfully Automated by AEM!");
 % Display the automation software has finished successfully.
 disp("Resonators Successfully Simulated!");
-%}
+
+
+
+% Diplaying bar chart for number of simulations performed per resonator.
+
+% Converting resonant frequency to string
+User_Frequencies = string(User_Frequencies);
+
+% Plotting a bar chart
+figure;
+bar(simCounts);
+set(gca, 'XTickLabel', User_Frequencies); % Set resonances as x-axis labels
+xlabel('Resonant Frequency (GHz)');
+ylabel('Number of Simulations Performed');
+title('Simulations Performed for each MKID');
+xtickangle(90);
+grid on
+
+% Save bar chart as a pdf
+saveas(gcf,'Sim_Distribution.pdf')
 
 end
