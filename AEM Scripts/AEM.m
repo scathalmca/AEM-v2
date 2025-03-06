@@ -266,6 +266,8 @@ ylabel('Number of Simulations Performed');
 title('Simulations Performed for each MKID');
 xtickangle(90);
 grid on
+% Improve readability of bar chart
+xlim([(min(User_Frequencies)-1) (max(User_Frequencies)+1)]);
 
 % Save bar chart as a pdf
 saveas(gcf,'Sim_Distribution.pdf')
