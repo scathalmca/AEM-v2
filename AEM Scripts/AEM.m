@@ -5,6 +5,11 @@ clear global
 
 % Make global variables
 global f Int_Cap_Coords F_Spacing Bar_Thickness G_Variation Mesh_Level
+
+
+% Create .txt file.
+Data_filename = "Resonator Data File.txt";
+
 %                         f
 % Stored window prompt to let the user know what stage AEM is currently on
 % and how far it has progressed.
@@ -137,9 +142,9 @@ for b = 1: numel(User_Frequencies)
         % Rename .son and .csv files to resonant frequency and delete old
         % files.
         old_son_file=str;
-        str_son=num2str(Resonance*1000)+"MHz.son";
+        str_son=num2str(User_Frequencies(b)*1000)+"MHz.son";
         str_csv_old=erase(str, ".son")+".csv";
-        str_csv_new=num2str(Resonance*1000)+"MHz.csv";
+        str_csv_new=num2str(User_Frequencies(b)*1000)+"MHz.csv";
         Project.saveAs(str_son);
         movefile(str_csv_old, str_csv_new);
         delete(old_son_file);
@@ -153,8 +158,9 @@ for b = 1: numel(User_Frequencies)
         end
         % If failed checks, repeat loop until a correct geometry is found
     end
+
     % Filename of correct MKID to append to EndResonators
-    Filename = convertCharsToStrings(Sweep_Matrix{1, 4}(2,1));
+    Filename = str_son;
     % Count number of resonators successfully automated so far
     Res_Num = Res_Num + 1;
     % Append values to EndResonators for later.
@@ -172,20 +178,57 @@ for b = 1: numel(User_Frequencies)
 
     % Reset the number of simulations performed.
     SimCounter('new'); 
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Create file to write all data into
+    if b == 1
+        % Create new empty text file
+        txtfile=fopen(Data_filename, "w+");
+    else
+        % Write to previous textfile without remove data
+        txtfile=fopen(Data_filename, "a");
+    end
+    
+
+    % Printing Data to textfile
+    fprintf(txtfile, "\n");
+
+    % Print resonance to textfile and convert from GHz to MHz
+    Res_Print = Resonance*1e3;
+    Q_Print = round(Q_Factor);
+
+    fprintf(txtfile, "%s%23s%33s%26s%26s", Filename, num2str(User_Frequencies(b)*1000), num2str(Res_Print), num2str(Q_Print), num2str(Counter));
+   
+    % Close .txt file
+    fclose(txtfile);
 end
+
+% Step 1: Read existing contents
+fid = fopen(Data_filename, 'r');
+
+% Save all contents currently printed
+oldText = fread(fid, '*char')';
+fclose(fid);
+
+% Open file for writing (overwrite mode)
+fid = fopen(Data_filename, 'w+');
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%                    :SECTION 4:                  %%%%%
         %%%%%                   Printing Data                 %%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Import 
 % Write all data to a txt file
 % Return all resonant frequencies, Q Factor and Filenames belonging to the
 % finished MKIDs.
 [all_Resonances, all_QFactors, all_Filenames] = EndResonators(0, 0, 0, "get");
 
 % Create .txt file.
-txtfile=fopen("Resonator Data File.txt", "w+");
+% txtfile=fopen("Resonator Data File.txt", "w+");
 % Stop timer and calculate elapsed time
 elapsedTime = toc;
 % Calculate time in hours, minutes, and seconds
@@ -210,37 +253,36 @@ fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"User Resonances(MHz)", repmat('_
 fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"Resonances(MHz)", repmat('_', 1, 6));
 fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"Q-Factor", repmat('_', 1, 6), "|");
 fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"# of Sims", repmat('_', 1, 6), "|");
+fprintf(txtfile, "\n");
+
+% Step 4: Write original contents
+fprintf(fid, '%s', oldText);
+
+fclose(fid);
+
 for i=1:numel(all_Resonances)
-    %%%%%%%%%%%%%%%%%%%%
-    % Printing data to .txt
-    %%%%%%%%%%%%%%%%%%%%
-    fprintf(txtfile, "\n");
-    
-    % Set resonant frequencies from GHz to MHz and round
-    all_Resonances(i) = round(all_Resonances(i)*1e3, 2);
-    
-    % Round Qc Factors.
-    all_QFactors(i)=round(all_QFactors(i));
-    % Print values to .txtfile line by line.
-    fprintf(txtfile, "%s%23s%33s%26s%26s", all_Filenames(i), num2str(User_Frequencies(i)*1000), num2str(all_Resonances(i)), num2str(all_QFactors(i)), num2str(simCounts(i)));
-    %%%%%%%%%%%%%%%%%%%%
+
     % Storing .son and .csv files
-    %%%%%%%%%%%%%%%%%%%%
-    % Move all finished MKID geometries and .csv data files to new folder.
-    mkdir FinishedMKIDs\Sonnet_Files\
-    movefile(all_Filenames(i), "FinishedMKIDs\Sonnet_Files\");
-    str_csv=erase(all_Filenames(i),".son") + ".csv";
-    mkdir FinishedMKIDs\Excel_Files\
-    movefile(str_csv, "FinishedMKIDs\Excel_Files\")
-    %%%%%%%%%%%%%%%%%%%%%%%
-    % Creating GDSII Files for Prototyping
-    %Project = SonnetProject(all_Filenames(i));
-    %[GDS_Filename] = GDSII_Maker(Project);
-    %mkdir FinishedMKIDs\GDSII_Files\
-    %movefile(GDS_Filename, "FinishedMKIDs\GDSII_Files\")
+    try
+        %%%%%%%%%%%%%%%%%%%%
+        % Move all finished MKID geometries and .csv data files to new folder.
+        mkdir FinishedMKIDs\Sonnet_Files\
+        movefile(all_Filenames(i), "FinishedMKIDs\Sonnet_Files\");
+        str_csv=erase(all_Filenames(i),".son") + ".csv";
+        mkdir FinishedMKIDs\Excel_Files\
+        movefile(str_csv, "FinishedMKIDs\Excel_Files\")
+        %%%%%%%%%%%%%%%%%%%%%%%
+        % Creating GDSII Files for Prototyping
+        %Project = SonnetProject(all_Filenames(i));
+        %[GDS_Filename] = GDSII_Maker(Project);
+        %mkdir FinishedMKIDs\GDSII_Files\
+        %movefile(GDS_Filename, "FinishedMKIDs\GDSII_Files\")
+
+    catch 
+
+    end
 end
-% Close .txt file
-fclose(txtfile);
+
 % Change directory and make new folder
 mkdir ExcessGeometries\
 %Moving all excess geometries to seperate folder
@@ -251,25 +293,28 @@ waitbar(1, f, "All Resonators Successfully Automated by AEM!");
 disp("Resonators Successfully Simulated!");
 
 
+%{
 
 % Diplaying bar chart for number of simulations performed per resonator.
 
 % Converting resonant frequency to string
-User_Frequencies = string(User_Frequencies);
+User_Frequencies_str = string(User_Frequencies);
 
 % Plotting a bar chart
 figure;
 bar(simCounts);
-set(gca, 'XTickLabel', User_Frequencies); % Set resonances as x-axis labels
+set(gca, 'XTickLabel', User_Frequencies_str); % Set resonances as x-axis labels
 xlabel('Resonant Frequency (GHz)');
 ylabel('Number of Simulations Performed');
 title('Simulations Performed for each MKID');
 xtickangle(90);
 grid on
+
 % Improve readability of bar chart
 xlim([(min(User_Frequencies)-1) (max(User_Frequencies)+1)]);
 
 % Save bar chart as a pdf
 saveas(gcf,'Sim_Distribution.pdf')
+%}
 
 end

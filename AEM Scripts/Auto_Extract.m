@@ -90,7 +90,7 @@ end
 % calculation.
 
 index = find(S21==min(S21));
-Resonance=round(Frequency(index),4);
+Resonance=Frequency(index);
 % Resonance found and data is physical
 HM=(max(S21)+min(S21))/2;
 [xInt1]=intersections(Frequency(1:index), S21(1:index)-HM, Frequency(1:index), zeros(1,numel(S21(1:index))));

@@ -120,6 +120,7 @@ while true
         try
             % Extract resonant frqeuency and Qc Factor
             [Resonance, Q_Factor] = Auto_Extract(Project)
+         
         catch ME
             % Some error occurred, so repeat Auto_Sim
             [Resonance, Q_Factor] = Auto_Sim(Project, upperbound+0.5, lowerbound-0.5);
