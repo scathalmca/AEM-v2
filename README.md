@@ -73,7 +73,7 @@ Before using AEM, it is necessary to follow the steps below:
 
 1. In MATLAB, set your current path to the same folder that contains the Sonnet project files.
 2. Also, set your current folder to the same folder as the Sonnet project files.
-3. Make sure to include the AEM Lk scripts, SonnetLab Toolbox scripts and intersection scripts in your current path.
+3. Make sure to include the AEM scripts, SonnetLab Toolbox scripts and intersection scripts in your current path.
 4. In the Sonnet Job Queue window, set the job queue to Auto Run.
 5. In each Sonnet geometry file, make sure the output of the data file(i.e. csv file) is in the project folder (same folder as the geometry file).
 6. During the automation, do not change the current folder. This will throw errors in the automation as AEM Lk will be unable to find the project/log files.
