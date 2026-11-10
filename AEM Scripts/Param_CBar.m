@@ -2,7 +2,12 @@ function [Project, Sweep_Matrix, All_MKID_Coords, CBar_Fail] = Param_CBar(Projec
 
 global G_Variation
 
-Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+Resonance = Sweep_Matrix{1, 4}(1,1);
+if isstring(Resonance)
+    Resonance = str2double(Resonance);
+elseif iscell(Resonance)
+    Resonance = str2double(cell2mat(Resonance));
+end
 Q_Factor = Sweep_Matrix{1, 6}(2,1);
 
 prev_filename = Project.Filename;

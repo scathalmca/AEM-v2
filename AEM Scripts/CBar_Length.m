@@ -7,7 +7,7 @@ Bar_YCoords = All_MKID_Coords{6};
 MaxBar_Length = RightMKID_XCoords(1)-LeftMKID_XCoords(2);
 Quarter_Length = round((MaxBar_Length/4));
 Thickness_Variation =0;
-if (Bar_XCoords(1) <= LeftMKID_XCoords(2)) && Change == 1
+if (Bar_XCoords(1) <= LeftMKID_XCoords(2)) && Change == Critical_Dim
     % The Coupling Bar length can no longer be increased as the Coupling Bar
     % thickness must be varied first.
     Thickness_Variation = 1;
@@ -32,7 +32,7 @@ if (Bar_XCoords(1) <= LeftMKID_XCoords(2)) && Change == 1
     % Return Corrected Coordinates
     All_MKID_Coords{5} = Bar_XCoords;
     return
-elseif (Bar_XCoords(1) >= RightMKID_XCoords(1)-Quarter_Length) && Change == -1
+elseif (Bar_XCoords(1) >= RightMKID_XCoords(1)-Quarter_Length) && Change == -Critical_Dim
     % The Coupling Bar length can no longer be decreased as the Coupling Bar
     % thickness must be varied first.
     Thickness_Variation = 1;
@@ -72,7 +72,7 @@ Project.deletePolygonUsingId(CBar_Polygon);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %if Change == 1
     % Increase the Length by +1 Quarter_Length
-if Change == -1
+if Change == -Critical_Dim
     % Decrease the Length by -1 Quarter_Length
     Quarter_Length = -Quarter_Length;
 end

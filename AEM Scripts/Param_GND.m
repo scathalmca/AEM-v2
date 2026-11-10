@@ -1,7 +1,14 @@
 function [Project, Sweep_Matrix, All_GND_Coords] = Param_GND(Project,Sweep_Matrix, Q_Range, All_GND_Coords, All_MKID_Coords)
 %  PARAM_GND2 Function to parameterise the GND plane polygons surrounding an MKID until 
 % the structure's Qc value fits within a user defined range.
-Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+global Critical_Dim
+
+Resonance = Sweep_Matrix{1, 4}(1,1);
+if isstring(Resonance)
+    Resonance = str2double(Resonance);
+elseif iscell(Resonance)
+    Resonance = str2double(cell2mat(Resonance));
+end
 Q_Factor = Sweep_Matrix{1, 6}(2,1);
 prev_filename = Project.Filename;
 prev_resonance = Resonance;
@@ -9,12 +16,12 @@ BotMKID_YCoords = All_MKID_Coords{6};
 BotGND_YCoords = All_GND_Coords{1,4}(2,:);
 Q_Lowerbound = Q_Range(1);
 Q_Upperbound = Q_Range(2);
-if (BotGND_YCoords(1)-1) <= BotMKID_YCoords(3) || Q_Factor > (Q_Upperbound)
+if (BotGND_YCoords(1)-Critical_Dim) <= BotMKID_YCoords(3) || Q_Factor > (Q_Upperbound)
     % Begin moving the GND plane away from the MKID (i.e. reducing surface
     % area) to lower the Qc factor s.t. it is between (Q_Lowerbound -1000) & (Q_Upperbound +1000)
     i=0;
     while true
-        i = i+1;
+        i = i+Critical_Dim;
         try
             [All_GND_Coords] = Param_GNDPoly(Project, -i);
         catch ME
@@ -63,7 +70,7 @@ if (BotGND_YCoords(1)-1) <= BotMKID_YCoords(3) || Q_Factor > (Q_Upperbound)
         % parameterisation and no more variations can take place without
         % major errors.
         BotGND_YCoords = All_GND_Coords{1,4}(2,:);
-        if BotGND_YCoords(3) - BotGND_YCoords(1) <= 1
+        if BotGND_YCoords(3) - BotGND_YCoords(1) <= Critical_Dim
             % No more GND plane parameterisation can be performed and the
             % MKID geometry can't reach the desired Qc Factor.
             warning("This MKID structure can not reach the desired Qc Range! Please adjust the Qc range or the MKID structure itself and re-run AEM.")
@@ -73,12 +80,12 @@ if (BotGND_YCoords(1)-1) <= BotMKID_YCoords(3) || Q_Factor > (Q_Upperbound)
         prev_resonance = Resonance;
         prev_filename = str_son;
     end
-elseif (BotGND_YCoords(1)-2) >= BotMKID_YCoords(3) && Q_Factor < (Q_Lowerbound)
+elseif (BotGND_YCoords(1)-(2*Critical_Dim)) >= BotMKID_YCoords(3) && Q_Factor < (Q_Lowerbound)
     % Begin moving the GND plane toward the MKID (i.e. increasing surface
     % area) to higher the Qc factor s.t. it is between (Q_Lowerbound -1000) & (Q_Upperbound +1000)
     i=0;
     while true
-        i = i+1;
+        i = i+Critical_Dim;
         [All_GND_Coords] = Param_GNDPoly(Project, i);
         % Name the new structure
         str=append("Test", num2str(i),"_GND_", num2str(i),".son");
@@ -119,7 +126,7 @@ elseif (BotGND_YCoords(1)-2) >= BotMKID_YCoords(3) && Q_Factor < (Q_Lowerbound)
         % parameterisation and no more variations can take place without
         % major errors.
         BotGND_YCoords = All_GND_Coords{1,4}(2,:);
-        if (BotGND_YCoords(1)-2) <= BotMKID_YCoords(3)
+        if (BotGND_YCoords(1)-(2*Critical_Dim)) <= BotMKID_YCoords(3)
             % No more GND plane parameterisation can be performed and the
             % MKID geometry can't reach the desired Qc Factor.
             warning("This MKID structure can not reach the desired Qc Range! Please adjust the Qc range or the MKID structure itself and re-run AEM.")

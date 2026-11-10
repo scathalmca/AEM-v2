@@ -1,7 +1,7 @@
 function [X1_Co, X2_Co, X3_Co] = BinarySweep(Project, Sweep_Matrix)
 %  BINARYSWEEP 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global Int_Cap_Coords
+global Int_Cap_Coords Critical_Dim
 % This function takes in coordinates of two MKID geometries that satisfy
 % the condition:  f1 <= User_Frequency <= f2.
 % When this condition is satisfied, a geometry exists within a capacitor

@@ -177,6 +177,7 @@ if min(User_Frequencies) < min_Resonance || max(User_Frequencies) > max_Resonanc
     end
 end
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Now we want to perform 3 simulations (1/4 filled, 1/2 filled and 3/4 filled IDC areas)

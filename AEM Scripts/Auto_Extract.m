@@ -20,14 +20,14 @@ Resonance=Frequency(index);
 % suddenly drops anywhere away from resonance.
 if (isempty(local_minima)==1 && S21(end) == min(S21)) 
     % No resonance detected
-    disp("No resonance detected...")
+    disp("No resonance detected...Fixing Frequency Bounds...")
     upperbound = upperbound+1;
     lowerbound = lowerbound-1;
     [Resonance, Q_Factor] = Auto_Sim(Project, upperbound,lowerbound);
     return
 elseif S21(end) == min(S21)
     % Resonance exists but S21 data drops after resonance (unlikely)
-    disp("S21 drops off after resonance...")
+    disp("S21 drops off after resonance...Attempting to resimulate...")
     index1 = find(S21 == local_minima(1));
     upperbound =round(cast(Frequency(index1), "double") +0.05, 4);
     lowerbound =round(cast(Frequency(index1), "double") -0.05, 4);
@@ -35,7 +35,7 @@ elseif S21(end) == min(S21)
     return
     
 elseif numel(S21(S21>1.000005))~=0
-    disp("S21 above 1!...")
+    disp("S21 above 1!...Attempting to resimulate...")
     index = find(S21==min(S21));
     Resonance=round(Frequency(index),4);
     if upperbound == round(Resonance + 0.01,4)

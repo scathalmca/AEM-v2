@@ -1,6 +1,6 @@
 function [Sweep_Matrix] = Sense_Sweep(Project, Sweep_Matrix)
 %  SENSE_SWEEP5 
-global Int_Cap_Coords F_Spacing
+global Int_Cap_Coords F_Spacing Critical_Dim
 % Importing values from each row of Sweep_Matrix
 X1_Co = Sweep_Matrix{1, 1}(1,1);
 X2_Co = Sweep_Matrix{1, 2}(1,1);
@@ -9,7 +9,12 @@ Y1_Co =Sweep_Matrix{1, 1}(1,2);
 Y2_Co = Sweep_Matrix{1, 1}(2,2);
 % Import resonant frequencies from Sweep_Matrix
 % Current MKID Resonant Frequency
-Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+Resonance = Sweep_Matrix{1, 4}(1,1);
+if isstring(Resonance)
+    Resonance = str2double(Resonance);
+elseif iscell(Resonance)
+    Resonance = str2double(cell2mat(Resonance));
+end
 User_Frequency = Sweep_Matrix{1, 6}(1,1);
 % Previous MKID Resonant Frequency
 prev_resonance = Resonance;
@@ -17,17 +22,7 @@ Q_Factor = Sweep_Matrix{1, 6}(2,1);
 Filename = convertCharsToStrings(char(Sweep_Matrix{1, 4}(2,1)));
 prev_Q = Q_Factor;
 prev_filename = Filename;
-y1_co = Sweep_Matrix{1, 1}(1,2)
-y2_co = Sweep_Matrix{1, 1}(2,2)
-x1_co=Sweep_Matrix{1, 1}(1,1)
-x2_co = Sweep_Matrix{1, 2}(1,1)
-x3_co = Sweep_Matrix{1, 3}(1,1)
-f1 = Sweep_Matrix{1, 4}(1,1)
-f1_name = Sweep_Matrix{1, 4}(2,1)
-f2 = Sweep_Matrix{1, 5}(1,1)
-f2_name = Sweep_Matrix{1, 5}(2,1)
-user_frequency = Sweep_Matrix{1, 6}(1,1)
-Qfactor = Sweep_Matrix{1, 6}(2,1)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Build from f1
 if X1_Co > X3_Co
@@ -36,13 +31,13 @@ if X1_Co > X3_Co
         % While iterating, we need to check if we have gone too far and
         % completed a full length of capacitor finger without reaching the
         % user's resonant frequency
-        if round(X1_Co - 1) < round(Int_Cap_Coords(1)+F_Spacing)
+        if round(X1_Co - Critical_Dim) < round(Int_Cap_Coords(1)+F_Spacing)
             % We have reached the limit and thus move iterate on the next
             % finger.
             % Can do this by placing a small piece on the next leg up,
             % resetting coordintes and running recursion
             % Place small piece of capacitor on next leg (LEFT)
-            X_Array = [Int_Cap_Coords(1)  Int_Cap_Coords(1)+2  Int_Cap_Coords(1)+2  Int_Cap_Coords(1)];
+            X_Array = [Int_Cap_Coords(1)  Int_Cap_Coords(1)+(2*Critical_Dim)  Int_Cap_Coords(1)+(2*Critical_Dim)  Int_Cap_Coords(1)];
             F_Thickness = round(Y2_Co - Y1_Co);
             Y2_Co = Y2_Co - (F_Spacing + F_Thickness);
             Y1_Co = Y2_Co - F_Thickness;
@@ -52,7 +47,7 @@ if X1_Co > X3_Co
             % Reset new bounds
             % Importing values from each row of Sweep_Matrix
             Sweep_Matrix{1, 1}(1,1) = Int_Cap_Coords(1);
-            Sweep_Matrix{1, 2}(1,1) = Int_Cap_Coords(1)+2;
+            Sweep_Matrix{1, 2}(1,1) = Int_Cap_Coords(1)+(2*Critical_Dim);
             Sweep_Matrix{1, 3}(1,1) = Int_Cap_Coords(3)-F_Spacing;
             Sweep_Matrix{1, 1}(1,2) = Y1_Co;
             Sweep_Matrix{1, 1}(2,2) = Y2_Co;
@@ -64,13 +59,13 @@ if X1_Co > X3_Co
             return
         end
         % Remove capacitor finger polygon closest to the inductor.
-        removex=round(mean([Int_Cap_Coords(3) (Int_Cap_Coords(3)-2)]));
+        removex=round(mean([Int_Cap_Coords(3) (Int_Cap_Coords(3)-(2*Critical_Dim))]));
         removey=round(mean([Y1_Co Y2_Co]));
         % Find the polygons DebugID
         first_Polygon=Project.findPolygonUsingPoint(removex, removey).DebugId;
         % Remove the polygon using the DebugID
         Project.deletePolygonUsingId(first_Polygon);
-        X1_Co = X1_Co - 1;
+        X1_Co = X1_Co - Critical_Dim;
         X_Array = [X1_Co  Int_Cap_Coords(3)  Int_Cap_Coords(3)  X1_Co];
         Y_Array = [Y1_Co  Y1_Co  Y2_Co  Y2_Co];
         % Place new polygon
@@ -124,7 +119,7 @@ if X1_Co > X3_Co
                 Sweep_Matrix{1, 5}(1,1) = prev_resonance;
                 Sweep_Matrix{1, 6}(2,1) = prev_Q;
                 Sweep_Matrix{1, 4}(2,1) = prev_filename;
-                Sweep_Matrix{1, 1}(1,1) = X1_Co+1;
+                Sweep_Matrix{1, 1}(1,1) = X1_Co+Critical_Dim;
                 Sweep_Matrix{1, 2}(1,1) = Int_Cap_Coords(3);
                 Sweep_Matrix{1, 3}(1,1) = Int_Cap_Coords(1) + F_Spacing;
             end
@@ -143,13 +138,13 @@ else
         % While iterating, we need to check if we have gone too far and
         % completed a full length of capacitor finger without reaching the
         % user's resonant frequency
-        if round(X2_Co + 1) > round(Int_Cap_Coords(3)-F_Spacing)
+        if round(X2_Co + Critical_Dim) > round(Int_Cap_Coords(3)-F_Spacing)
             % We have reached the limit and thus move iterate on the next
             % finger.
             % Can do this by placing a small piece on the next leg up,
             % resetting coordintes and running recursion
             % Place small piece of capacitor on next leg (RIGHT)
-            X_Array = [Int_Cap_Coords(3)-2  Int_Cap_Coords(3)  Int_Cap_Coords(3)  Int_Cap_Coords(3)-2];
+            X_Array = [Int_Cap_Coords(3)-(2*Critical_Dim)  Int_Cap_Coords(3)  Int_Cap_Coords(3)  Int_Cap_Coords(3)-(2*Critical_Dim)];
             F_Thickness = round(Y2_Co - Y1_Co);
             Y2_Co = Y2_Co - (F_Spacing + F_Thickness);
             Y1_Co = Y2_Co - F_Thickness;
@@ -158,7 +153,7 @@ else
             Project.addMetalPolygonEasy(0, X_Array ,Y_Array, 1);
             % Reset new bounds
             % Importing values from each row of Sweep_Matrix
-            Sweep_Matrix{1, 1}(1,1) = Int_Cap_Coords(3)-2;
+            Sweep_Matrix{1, 1}(1,1) = Int_Cap_Coords(3)-(2*Critical_Dim);
             Sweep_Matrix{1, 2}(1,1) = Int_Cap_Coords(3);
             Sweep_Matrix{1, 3}(1,1) = Int_Cap_Coords(1)+F_Spacing;
             Sweep_Matrix{1, 1}(1,2) = Y1_Co;
@@ -171,13 +166,13 @@ else
             return
         end
         % Remove capacitor finger polygon closest to the inductor.
-        removex=round(mean([Int_Cap_Coords(1) (Int_Cap_Coords(1)+2)]));
+        removex=round(mean([Int_Cap_Coords(1) (Int_Cap_Coords(1)+(2*Critical_Dim))]));
         removey=round(mean([Y1_Co Y2_Co]));
         % Find the polygons DebugID
         first_Polygon=Project.findPolygonUsingPoint(removex, removey).DebugId;
         % Remove the polygon using the DebugID
         Project.deletePolygonUsingId(first_Polygon);
-        X2_Co = X2_Co + 1;
+        X2_Co = X2_Co + Critical_Dim;
         X_Array = [Int_Cap_Coords(1)  X2_Co  X2_Co  Int_Cap_Coords(1)];
         Y_Array = [Y1_Co  Y1_Co  Y2_Co  Y2_Co];
         % Place new polygon

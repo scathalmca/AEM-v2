@@ -1,10 +1,10 @@
-function [] = AEM(Project, StartingVariables, GND_Input)
+function [] = AEM(Project, StartingVariables, GND_Input, Critical_Dim)
 %  NEWAEM l function for running the automation software AEM.
 % Clear all existing global variables
 clear global
 
 % Make global variables
-global f Int_Cap_Coords F_Spacing Bar_Thickness G_Variation Mesh_Level
+global f Int_Cap_Coords F_Spacing Bar_Thickness G_Variation Mesh_Level Critical_Dim
 
 
 % Create .txt file.
@@ -21,12 +21,7 @@ Data_filename = "Resonator Data File.txt";
 G_Variation = GND_Input;
 warning off
 [~,check] = system('tasklist');
-if contains(check, 'sonnet.exe')
-    system('TASKKILL /IM sonnet.exe');
-end
-if ~isfile("Simulation Log\")
-    mkdir("Simulation Logs\");
-end
+
 warning on
 % Extracting Variables from input list
 User_Frequencies = StartingVariables{1,1};
@@ -38,6 +33,10 @@ F_Spacing = StartingVariables{1,7};
 F_Thickness = StartingVariables{1,8};
 Bar_Thickness = StartingVariables{1,9};
 Mesh_Level = StartingVariables{1,10};
+x1 = StartingVariables{1,3}; 
+x2 = StartingVariables{1,4}; 
+y1 = StartingVariables{1,5}; 
+y2 = StartingVariables{1,6}; 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%%%%    Automated Electromagnetic MKID simulations   %%%%%
@@ -56,7 +55,7 @@ SimCounter('new');
 % Store resonant frequencies, Qc and filename of finished MKID structures
 EndResonators(0, 0, 0, 'new');
 [All_GND_Coords] = GNDPoly_Coords(Project);
-[LeftX, LeftY, RightX, RightY] = SideMKID_Coords(Project, All_GND_Coords, 1, Bar_Thickness, F_Spacing);
+[LeftX, LeftY, RightX, RightY] = SideMKID_Coords(Project, x1, x2, y1, y2);
 % Coordinates of the internal area of the capacitor
 Cap_x1 = round(LeftX(2));
 Cap_y1 = round(LeftY(1));
@@ -88,6 +87,7 @@ waitbar(0,f,"Checking Minimum & Maximum Resonant Frequencies...")
 % structure that matches the user's largest frequency.
 [Project, User_Frequencies, Starting_Point] = InterpStart(Project, User_Frequencies, F_Thickness);
 
+
 [TopX, TopY, BotX, BotY] = VerticalMKID_Coords(Project, All_GND_Coords);
 All_MKID_Coords = {TopY, LeftX, RightX, RightY, BotX, BotY};
 
@@ -98,7 +98,12 @@ Project = SonnetProject(Filename);
 % we can reduce the number of simulations needed by getting an accurate
 % value of Q_Factor to start.
 % Therefore we perform a smaller frequency sweep on f1
-Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+Resonance = Sweep_Matrix{1, 4}(1,1);
+if isstring(Resonance)
+    Resonance = str2double(Resonance);
+elseif iscell(Resonance)
+    Resonance = str2double(cell2mat(Resonance));
+end
 upperbound = Resonance + 0.01;
 lowerbound = Resonance - 0.01;
 % Simulate and analyse data with Auto_Sim
@@ -128,7 +133,13 @@ for b = 1: numel(User_Frequencies)
         Filename = Sweep_Matrix{1, 4}(2,1);
         Project = SonnetProject(Filename);
        
-        Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+        Resonance = Sweep_Matrix{1, 4}(1,1);
+        if isstring(Resonance)
+            Resonance = str2double(Resonance);
+        elseif iscell(Resonance)
+            Resonance = str2double(cell2mat(Resonance));
+        end
+        
         upperbound = Resonance + 0.01;
         lowerbound = Resonance - 0.01;
         % Name the new structure
@@ -184,6 +195,14 @@ for b = 1: numel(User_Frequencies)
     if b == 1
         % Create new empty text file
         txtfile=fopen(Data_filename, "w+");
+
+        % Write titles
+        fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"FileName", repmat('_', 1, 6));
+        fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"User Resonances(MHz)", repmat('_', 1, 6));
+        fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"Resonances(MHz)", repmat('_', 1, 6));
+        fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"Q-Factor", repmat('_', 1, 6), "|");
+        fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"# of Sims", repmat('_', 1, 6), "|");
+
     else
         % Write to previous textfile without remove data
         txtfile=fopen(Data_filename, "a");
@@ -205,13 +224,12 @@ end
 
 % Step 1: Read existing contents
 fid = fopen(Data_filename, 'r');
-
 % Save all contents currently printed
 oldText = fread(fid, '*char')';
 fclose(fid);
 
 % Open file for writing (overwrite mode)
-fid = fopen(Data_filename, 'w+');
+txtfile = fopen(Data_filename, 'w+');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -248,17 +266,12 @@ fprintf(txtfile, "\n");
 fprintf(txtfile,"%s%s", "Mean Accuracy(MHz) ", num2str((mean(Accuracy_Freq))));
 fprintf(txtfile, "\n");
 fprintf(txtfile, "\n");
-fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"FileName", repmat('_', 1, 6));
-fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"User Resonances(MHz)", repmat('_', 1, 6));
-fprintf(txtfile, '%s%s', "|",repmat('_', 1, 6),"Resonances(MHz)", repmat('_', 1, 6));
-fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"Q-Factor", repmat('_', 1, 6), "|");
-fprintf(txtfile, '%s%s%s%s%s', "|",repmat('_', 1, 6),"# of Sims", repmat('_', 1, 6), "|");
-fprintf(txtfile, "\n");
+
 
 % Step 4: Write original contents
-fprintf(fid, '%s', oldText);
+fprintf(txtfile, '%s', oldText);
 
-fclose(fid);
+fclose(txtfile);
 
 for i=1:numel(all_Resonances)
 
@@ -290,31 +303,10 @@ movefile *MHz.son ExcessGeometries\
 movefile *MHz.csv ExcessGeometries\
 waitbar(1, f, "All Resonators Successfully Automated by AEM!");
 % Display the automation software has finished successfully.
+
 disp("Resonators Successfully Simulated!");
 
 
-%{
 
-% Diplaying bar chart for number of simulations performed per resonator.
-
-% Converting resonant frequency to string
-User_Frequencies_str = string(User_Frequencies);
-
-% Plotting a bar chart
-figure;
-bar(simCounts);
-set(gca, 'XTickLabel', User_Frequencies_str); % Set resonances as x-axis labels
-xlabel('Resonant Frequency (GHz)');
-ylabel('Number of Simulations Performed');
-title('Simulations Performed for each MKID');
-xtickangle(90);
-grid on
-
-% Improve readability of bar chart
-xlim([(min(User_Frequencies)-1) (max(User_Frequencies)+1)]);
-
-% Save bar chart as a pdf
-saveas(gcf,'Sim_Distribution.pdf')
-%}
 
 end

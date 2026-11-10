@@ -1,4 +1,4 @@
-function [LeftX, LeftY, RightX, RightY] = SideMKID_Coords(Project, All_GND_Coords, Extend, Bar_Thickness, F_Spacing)
+function [Left_X, Left_Y, Right_X, Right_Y] = SideMKID_Coords(Project, xmin, xmax, ymin, ymax)
 %  SIDEMKID_COORDS 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This function is used to find the coordinates of the vertical polygon that forms the 
@@ -12,58 +12,71 @@ function [LeftX, LeftY, RightX, RightY] = SideMKID_Coords(Project, All_GND_Coord
 % Extend, F_Thickness & F_Spacing are only used at the start of AEM for the
 % construction of a coupling bar. They are ignored at all other points in
 % the automation.
-LeftGND_XCoords = All_GND_Coords{1,2}(1,:);
-RightGND_XCoords = All_GND_Coords{1,3}(1,:);
-RightGND_YCoords = All_GND_Coords{1,3}(2,:);
+
+global Bar_Thickness F_Spacing
+
+
 % Starting Left side k=0
 % Starting Right side k=1
-for k = 0 : 1
-    for j = RightGND_YCoords(3)-1 : -1 : RightGND_YCoords(1)+1
-        % Start scanning left until a polygon is detected
-        if k == 0
-            Start = LeftGND_XCoords(2) +1;
-            Steps = 1;
-            End = RightGND_XCoords(1) -1;
-        else
-            Start = RightGND_XCoords(1) -1;
-            Steps = -1;
-            End = LeftGND_XCoords(2) +1;
-        end
-        for i= Start : Steps : End
-            % Check to see if a polygon exists that point (i,j,0)
-            answer=Project.findPolygonUsingPoint(i, j, 0);
-            if isempty(answer)~=1
-                % If answer is not empty, a polygon exists at those coordinates
-                XCoords=answer.XCoordinateValues;
-                YCoords=answer.YCoordinateValues;
-                % Finding X Coords
-                XCoords = [XCoords{2}  XCoords{3}  XCoords{4}  XCoords{5}];
-                XCoords =round([min(XCoords)  max(XCoords)  max(XCoords)  min(XCoords)]);
-                % Finding Y Coords
-                YCoords = [YCoords{2}  YCoords{3}  YCoords{4}  YCoords{5}];
-                YCoords =round([min(YCoords)  min(YCoords)  max(YCoords)  max(YCoords)]);
-                if k == 0
-                    % Append Values for Left Side of MKID
-                    LeftX = XCoords;
-                    LeftY = YCoords;
-                else
-                    % Append Values for Right Side of MKID
-                    RightX = XCoords;
-                    RightY = YCoords;
-                end
-                break
-            end
-        end
-        % Continue looping through y and x directions until a polygon is found
-        if isempty(answer)~=1
-            break
-        end
+Polygons = Project.GeometryBlock.ArrayOfPolygons;
+
+indx = [];
+Max_X = [];
+Max_Y = [];
+
+% Find all polygons within search area
+for i = 1:numel(Polygons)
+
+    X = cell2mat(Polygons{i}.XCoordinateValues);
+    Y = cell2mat(Polygons{i}.YCoordinateValues);
+
+    if all(X >= xmin & X <= xmax) && all(Y >= ymin & Y <= ymax)
+
+        indx(end+1) = i;
+        Max_X(end+1) = max(X);
+        Max_Y(end+1) = max(Y);
+
     end
 end
-% If Extend == 1, the right vertical polygon will be extended for the
-% beginning of the automation to make a connection between the MKID and the
-% coupling bar
-if Extend == 1
+
+% Extract MKID polygons
+MKID_Polygons = Polygons(indx);
+
+% Find polygons sharing the maximum Y coordinate
+maxY = max(Max_Y);
+Side_Polygons = find(Max_Y == maxY);
+
+% Retrieve matching polygons
+Selected_Polygons = MKID_Polygons(Side_Polygons);
+% Find minimum X coordinate of each selected polygon
+Min_X = cellfun(@(p) min(cell2mat(p.XCoordinateValues)), Selected_Polygons);
+
+% Identify leftmost and rightmost polygons
+[~, left_idx] = min(Min_X);
+[~, right_idx] = max(Min_X);
+
+% Extract polygons
+Right_Polygon = Selected_Polygons{right_idx};
+Left_Polygon = Selected_Polygons{left_idx};
+
+
+% Finding X and Y Coords of Left MKID Polygon
+Right_X = cell2mat(Right_Polygon.XCoordinateValues);
+Right_Y = cell2mat(Right_Polygon.YCoordinateValues);
+
+Right_X =round([min(Right_X)  max(Right_X)  max(Right_X)  min(Right_X)]);
+Right_Y =round([min(Right_Y)  min(Right_Y)  max(Right_Y)  max(Right_Y)]);
+
+% Finding X and Y Coords of Left MKID Polygon
+Left_X = cell2mat(Left_Polygon.XCoordinateValues);
+Left_Y = cell2mat(Left_Polygon.YCoordinateValues);
+
+Left_X =round([min(Left_X)  max(Left_X)  max(Left_X)  min(Left_X)]);
+Left_Y =round([min(Left_Y)  min(Left_Y)  max(Left_Y)  max(Left_Y)]);
+
+
+
+%{
     % We want to build the Coupling Bar starting from the right side of
     % the MKID, so we must change the polygon that forms the right side of the
     % resonator such that it is + F_Spacing longer
@@ -77,5 +90,11 @@ if Extend == 1
     Project.addMetalPolygonEasy(0, RightX ,RightY, 1);
     
     Project.save();
-end
+
+%}
+
+Right_Y = round([max(Right_Y)  max(Right_Y)  (max(Right_Y)+F_Spacing+Bar_Thickness)  (max(Right_Y)+F_Spacing+Bar_Thickness)]);
+
+Project.addMetalPolygonEasy(0, Right_X, Right_Y, 1);
+
 end

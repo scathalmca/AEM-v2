@@ -1,15 +1,26 @@
 function [Project, Sweep_Matrix] = Reset_Coords(Sweep_Matrix)
 %  RESET_COORDS2 
-global Int_Cap_Coords  F_Spacing Bar_Thickness
+global Int_Cap_Coords  F_Spacing Bar_Thickness Critical_Dim
 Filename = Sweep_Matrix{1, 4}(2,1);
 Project = SonnetProject(Filename);
 Y1_Co = Sweep_Matrix{1, 1}(1,2);
 Y2_Co = Sweep_Matrix{1, 1}(2,2);
 X1_Co = Sweep_Matrix{1, 1}(1,1);
 X3_Co = Sweep_Matrix{1, 3}(1,1);
-Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
 Q_Factor = Sweep_Matrix{1, 6}(2,1);
-prev_resonance = str2double(cell2mat(Sweep_Matrix{1, 5}(1,1)));
+Resonance = Sweep_Matrix{1, 4}(1,1);
+if isstring(Resonance)
+    Resonance = str2double(Resonance);
+elseif iscell(Resonance)
+    Resonance = str2double(cell2mat(Resonance));
+end
+
+prev_resonance = Sweep_Matrix{1, 5}(1,1);
+if isstring(prev_resonance)
+    prev_resonance = str2double(prev_resonance);
+elseif iscell(Resonance)
+    prev_resonance = str2double(cell2mat(prev_resonance));
+end
 prev_filename = convertCharsToStrings(char(Sweep_Matrix{1, 5}(2,1)));
 prev_Q = Q_Factor;
 User_Frequency = Sweep_Matrix{1, 6}(1,1);
@@ -81,7 +92,7 @@ if Resonance < User_Frequency
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             % Place small section of length +2
-            X_Array = [Int_Cap_Coords(1)  Int_Cap_Coords(1)+2  Int_Cap_Coords(1)+2  Int_Cap_Coords(1)];
+            X_Array = [Int_Cap_Coords(1)  Int_Cap_Coords(1)+(2*Critical_Dim)  Int_Cap_Coords(1)+(2*Critical_Dim)  Int_Cap_Coords(1)];
             Y_Array = [Y1_Co  Y1_Co  Y2_Co  Y2_Co];
             % Place length = 2 polygon.
             Project.addMetalPolygonEasy(0, X_Array ,Y_Array, 1);
@@ -97,7 +108,7 @@ if Resonance < User_Frequency
             Project.deletePolygonUsingId(Polygon);
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Place small section of length +2
-            X_Array = [Int_Cap_Coords(3)-2  Int_Cap_Coords(3)  Int_Cap_Coords(3)  Int_Cap_Coords(3)-2];
+            X_Array = [Int_Cap_Coords(3)-(2*Critical_Dim)  Int_Cap_Coords(3)  Int_Cap_Coords(3)  Int_Cap_Coords(3)-(2*Critical_Dim)];
             Y_Array = [Y1_Co  Y1_Co  Y2_Co  Y2_Co];
             % Place length = 2 polygon.
             Project.addMetalPolygonEasy(0, X_Array ,Y_Array, 1);
@@ -269,7 +280,7 @@ elseif User_Frequency < prev_resonance
                         % the next line to allow the automation to
                         % continue.
                         Project = SonnetProject(prev_filename);
-                        prev_X_Array = [Int_Cap_Coords(1)  Int_Cap_Coords(1)+2  Int_Cap_Coords(1)+2  Int_Cap_Coords(1)];
+                        prev_X_Array = [Int_Cap_Coords(1)  Int_Cap_Coords(1)+(2*Critical_Dim)  Int_Cap_Coords(1)+(2*Critical_Dim)  Int_Cap_Coords(1)];
                         Y_Array = [Y1_Co  Y1_Co  Y2_Co  Y2_Co];
                         % Place polygon.
                         Project.addMetalPolygonEasy(0, prev_X_Array ,Y_Array, 1);
@@ -346,7 +357,7 @@ elseif User_Frequency < prev_resonance
                         % the next line to allow the automation to
                         % continue.
                         Project = SonnetProject(prev_filename);
-                        prev_X_Array = [Int_Cap_Coords(3)-2  Int_Cap_Coords(3)  Int_Cap_Coords(3)  Int_Cap_Coords(3)-2];
+                        prev_X_Array = [Int_Cap_Coords(3)-(2*Critical_Dim)  Int_Cap_Coords(3)  Int_Cap_Coords(3)  Int_Cap_Coords(3)-(2*Critical_Dim)];
                         Y_Array = [Y1_Co  Y1_Co  Y2_Co  Y2_Co];
                         % Place polygon.
                         Project.addMetalPolygonEasy(0, prev_X_Array ,Y_Array, 1);

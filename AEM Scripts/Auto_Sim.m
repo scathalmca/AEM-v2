@@ -56,15 +56,15 @@ aCallToSystem=['"' Path filesep 'bin' filesep 'soncmd.exe" -unlock "' Project.Fi
 % cmd to simulate the project with emstatus.exe, produce a log file to
 % monitor the simulation, and finally close Sonnet when the simulation is
 % complete.
-aCallToSystem=['"' Path filesep 'bin' filesep 'emstatus.exe" -Run "' Project.Filename '" -LogFile "' aLogFilename '" -CloseWhenDone &'];
+aCallToSystem=['"' Path filesep 'bin' filesep 'emstatus.exe" -Run "' Project.Filename '" -LogFile "' aLogFilename '" -CloseWhenDone'];
 
 % Call cmd line to simulate the project
 [aStatus, aMessage]=system(aCallToSystem);
 
-pause(0.5);
+pause(0.2);
 
 %Kill any cmd display windows
-[~,~]=system("taskkill /F /IM cmd.exe");
+%[~,~]=system("taskkill /F /IM cmd.exe");
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -77,6 +77,8 @@ csv_startTime = tic;
 while true
     %If .csv exists, break while statement
 
+    pause(0.2);
+
     % Normally, a while loop would be sufficient, but tests show that we
     % need to put a timer on the existance of the file. Same for the Log
     % file.
@@ -88,18 +90,6 @@ while true
 
         break
 
-        % If the creation of the csv file takes longer than 30 seconds, re-run
-        % the simulation
-    elseif csv_elapsedTime > 30
-
-        % close sonnet
-        [~,~]=system("taskkill /F /IM sonnet.exe");
-
-        [Resonance, Q_Factor] = Auto_Sim(Project, upperbound, lowerbound);
-
-        return
-
-
     end
 end
 
@@ -107,6 +97,8 @@ end
 % When the project has finished simulating, Sonnet will close and we can
 % extract data.
 while true
+
+    pause(0.2);
     
     % Check what programs are currently running
     [~,b] = system('tasklist');

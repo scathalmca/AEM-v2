@@ -1,6 +1,7 @@
 function [All_GND_Coords] = Param_GNDPoly(Project, Change)
 %  PARAM_GNDPOLY Function to increase or decrease the square area of the top most ground polygon 
 % in Sonnet.
+
 % Identify all current GND polygon coordinates
 [All_GND_Coords] = GNDPoly_Coords(Project);
 TopGND_XCoords = All_GND_Coords{1,1}(1,:);

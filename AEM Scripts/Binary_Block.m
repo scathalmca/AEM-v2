@@ -5,13 +5,25 @@ function [Sweep_Matrix] = Binary_Block(Project, Sweep_Matrix)
 % Geometries produced after Binary_Block has finished should be the closest
 % to the user's desired frequency as possible 
 % Initialise other variables from Sweep_Matrix
-Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+global Critical_Dim
+Resonance = Sweep_Matrix{1, 4}(1,1);
+if isstring(Resonance)
+    Resonance = str2double(Resonance);
+elseif iscell(Resonance)
+    Resonance = str2double(cell2mat(Resonance));
+end
+
 User_Frequency = Sweep_Matrix{1, 6}(1,1);
 Accuracy = 0.002;
 prev_X1 = Sweep_Matrix{1, 1}(1,1);
 prev_X2 = Sweep_Matrix{1, 2}(1,1);
 while true
-    Resonance = str2double(cell2mat(Sweep_Matrix{1, 4}(1,1)));
+    Resonance = Sweep_Matrix{1, 4}(1,1);
+    if isstring(Resonance)
+        Resonance = str2double(Resonance);
+    elseif iscell(Resonance)
+        Resonance = str2double(cell2mat(Resonance));
+    end
     X1_Co = Sweep_Matrix{1, 1}(1,1);
     X2_Co = Sweep_Matrix{1, 2}(1,1);
     X3_Co = Sweep_Matrix{1, 3}(1,1);

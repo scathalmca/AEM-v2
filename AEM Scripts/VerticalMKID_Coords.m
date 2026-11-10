@@ -3,6 +3,7 @@ function [TopX, TopY, BotX, BotY] = VerticalMKID_Coords(Project, All_GND_Coords)
 % is used to define the coordinates of the edge polygons such that when parameterising 
 % the GND planes around the MKID, there is no overlap in structures, causing a 
 % short.
+global Critical_Dim
 LeftGND_XCoords = All_GND_Coords{1,2}(1,:);
 RightGND_XCoords = All_GND_Coords{1,3}(1,:);
 RightGND_YCoords = All_GND_Coords{1,3}(2,:);
@@ -11,17 +12,17 @@ for k = 0:1
     % k = 1 - Looking for bottom (coupling bar) of MKID coordinates
     
     if k==0
-        Start = RightGND_YCoords(1)+1;
-        Step = 1;
-        End = RightGND_YCoords(3)-1;
+        Start = RightGND_YCoords(1)+Critical_Dim;
+        Step = Critical_Dim;
+        End = RightGND_YCoords(3)-Critical_Dim;
     else
-        Start = RightGND_YCoords(3)-1;
-        Step = -1;
-        End = RightGND_YCoords(1)+1;
+        Start = RightGND_YCoords(3)-Critical_Dim;
+        Step = -Critical_Dim;
+        End = RightGND_YCoords(1)+Critical_Dim;
     end
     for j = Start : Step : End
         % Start scanning left until a polygon is detected
-        for i=LeftGND_XCoords(2)+1 : 1 : RightGND_XCoords(1)-1
+        for i=LeftGND_XCoords(2)+Critical_Dim : Critical_Dim : RightGND_XCoords(1)-Critical_Dim
             % Check to see if a polygon exists that point (i,j,0)
             answer=Project.findPolygonUsingPoint(i, j, 0);
             if isempty(answer)~=1
